@@ -340,47 +340,17 @@
 <body>
     <div class="content-card">
         <div class="decor-line"></div>
-        <h1 class="title">theooo的改枪码</h1>
-        <div class="sub-text">点击卡片复制对应改枪码 ✨</div>
+        <h1 class="title" id="pageTitle"></h1>
+        <div class="sub-text" id="pageSubTitle"></div>
         
         <!-- 功能按钮组 -->
         <div class="btn-group">
-            <button class="lucky-btn" id="luckyBtn">抽幸运改枪码✨</button>
+            <button class="lucky-btn" id="luckyBtn"></button>
             <button class="theme-btn" id="themeBtn">🌞</button>
         </div>
 
-        <!-- 多条目卡片容器 -->
-        <div class="text-group" id="textGroup">
-            <div class="main-text">腾龙突击步枪-烽火地带-6IA0JQ00BAFJS4ST7C7E4</div>
-            <div class="main-text">K437突击步枪-烽火地带-6I7U2E40BAFJS4ST7C7E4</div>
-            <div class="main-text">SKS射手步枪-烽火地带-6I9VVTC0BAFJS4ST7C7E4</div>
-            <div class="main-text">QJB201轻机枪-烽火地带-6I9MQHO0BAFJS4ST7C7E4</div>
-            <div class="main-text">SR-3M紧凑突击步枪-烽火地带-6I9P71C01TBN8TTTF638O</div>
-            <div class="main-text">SR-25射手步枪-烽火地带-6I9VVGO0BAFJS4ST7C7E4</div>
-            <div class="main-text">AS Val突击步枪-烽火地带-6I9P3H801TBN8TTTF638O</div>
-            <div class="main-text">M4A1突击步枪-烽火地带-6I9MONG0BAFJS4ST7C7E4</div>
-            <div class="main-text">M4A1无突击步枪-烽火地带-6I8UN2C0BAFJS4ST7C7E4</div>
-            <div class="main-text">ASh-12战斗步枪-烽火地带-6I9TI4001TBN8TTTF638O</div>
-            <div class="main-text">G3战斗步枪-烽火地带-6IC032S0BAFJS4ST7C7E4</div>
-            <div class="main-text">AK-12突击步枪-烽火地带-6ICIJFO0BAFJS4ST7C7E4</div>
-            <div class="main-text">QBZ95-1突击步枪-烽火地带-6IC02U00BAFJS4ST7C7E4</div>
-            <div class="main-text">MK47突击步枪-烽火地带-6IC03V00BAFJS4ST7C7E4</div>
-            <div class="main-text">勇士冲锋枪-烽火地带-6IC06NC0BAFJS4ST7C7E4</div>
-            <div class="main-text">AKM突击步枪-烽火地带-6IC07SC0BAFJS4ST7C7E4</div>
-            <div class="main-text">MP7冲锋枪-烽火地带-6IC08EC0BAFJS4ST7C7E4</div>
-            <div class="main-text">MP7冲锋枪-烽火地带-6IC08RG0BAFJS4ST7C7E4</div>
-            <div class="main-text">SMG-45冲锋枪-烽火地带-6IC7TIK0BAFJS4ST7C7E4</div>
-            <div class="main-text">S12K霰弹枪-烽火地带-6IC7UC40BAFJS4ST7C7E4</div>
-            <div class="main-text">杠杆式步枪-烽火地带-6ICAJR801TBN8TTTF638O</div>
-            <div class="main-text">PKM通用机枪-烽火地带-6ICAKG401TBN8TTTF638O</div>
-            <div class="main-text">M250通用机枪-烽火地带-6ICAMDC01TBN8TTTF638O</div>
-            <div class="main-text">AUG突击步枪-烽火地带-6ICAN4801TBN8TTTF638O</div>
-            <div class="main-text">M14射手步枪-烽火地带-6ICAP4O01TBN8TTTF638O</div>
-            <div class="main-text">SVD狙击步枪-烽火地带-6ICAQH801TBN8TTTF638O</div>
-            <div class="main-text">PTR-32突击步枪-烽火地带-6ICHDNC0BAFJS4ST7C7E4</div>
-            <div class="main-text">K416突击步枪-烽火地带-6ICIHD80BAFJS4ST7C7E4</div>
-            <div class="main-text">KC17突击步枪-烽火地带-6ICII6S0BAFJS4ST7C7E4</div>
-        </div>
+        <!-- 多条目卡片容器（动态渲染） -->
+        <div class="text-group" id="textGroup"></div>
         <div class="decor-line"></div>
     </div>
 
@@ -390,13 +360,92 @@
     <button class="back-to-top" id="backToTop">↑</button>
 
     <script>
+        // ====================== 无代码配置区（只需修改这里！）======================
+        const config = {
+            // 页面标题
+            pageTitle: "theooo的改枪码",
+            // 页面副标题
+            pageSubTitle: "点击卡片复制对应改枪码 ✨",
+            // 幸运改枪码按钮文字
+            luckyBtnText: "抽幸运改枪码✨",
+            // 暗黑模式按钮图标（白天/黑夜）
+            themeBtnIcons: {
+                light: "🌞",
+                dark: "🌙"
+            },
+            // 改枪码列表（增删/修改只需改这个数组）
+            gunCodes: [
+                "腾龙突击步枪-烽火地带-6IA0JQ00BAFJS4ST7C7E4",
+                "K437突击步枪-烽火地带-6I7U2E40BAFJS4ST7C7E4",
+                "SKS射手步枪-烽火地带-6I9VVTC0BAFJS4ST7C7E4",
+                "QJB201轻机枪-烽火地带-6I9MQHO0BAFJS4ST7C7E4",
+                "SR-3M紧凑突击步枪-烽火地带-6I9P3H801TBN8TTTF638O",
+                "SR-25射手步枪-烽火地带-6I9VVGO0BAFJS4ST7C7E4",
+                "AS Val突击步枪-烽火地带-6I9P3H801TBN8TTTF638O",
+                "M4A1突击步枪-烽火地带-6I9MONG0BAFJS4ST7C7E4",
+                "M4A1无突击步枪-烽火地带-6I8UN2C0BAFJS4ST7C7E4",
+                "ASh-12战斗步枪-烽火地带-6I9TI4001TBN8TTTF638O",
+                "G3战斗步枪-烽火地带-6IC032S0BAFJS4ST7C7E4",
+                "AK-12突击步枪-烽火地带-6ICIJFO0BAFJS4ST7C7E4",
+                "QBZ95-1突击步枪-烽火地带-6IC02U00BAFJS4ST7C7E4",
+                "MK47突击步枪-烽火地带-6IC03V00BAFJS4ST7C7E4",
+                "勇士冲锋枪-烽火地带-6IC06NC0BAFJS4ST7C7E4",
+                "AKM突击步枪-烽火地带-6IC07SC0BAFJS4ST7C7E4",
+                "MP7冲锋枪-烽火地带-6IC08EC0BAFJS4ST7C7E4",
+                "MP7冲锋枪-烽火地带-6IC08RG0BAFJS4ST7C7E4",
+                "SMG-45冲锋枪-烽火地带-6IC7TIK0BAFJS4ST7C7E4",
+                "S12K霰弹枪-烽火地带-6IC7UC40BAFJS4ST7C7E4",
+                "杠杆式步枪-烽火地带-6ICAJR801TBN8TTTF638O",
+                "PKM通用机枪-烽火地带-6ICAKG401TBN8TTTF638O",
+                "M250通用机枪-烽火地带-6ICAMDC01TBN8TTTF638O",
+                "AUG突击步枪-烽火地带-6ICAN4801TBN8TTTF638O",
+                "M14射手步枪-烽火地带-6ICAP4O01TBN8TTTF638O",
+                "SVD狙击步枪-烽火地带-6ICAQH801TBN8TTTF638O",
+                "PTR-32突击步枪-烽火地带-6ICHDNC0BAFJS4ST7C7E4",
+                "K416突击步枪-烽火地带-6ICIHD80BAFJS4ST7C7E4",
+                "KC17突击步枪-烽火地带-6ICII6S0BAFJS4ST7C7E4"
+            ],
+            // 复制成功文案
+            copySuccessText: "复制成功 ✅",
+            // 幸运码复制成功文案模板（{gunName}会自动替换成枪械名称）
+            luckyCopySuccessTemplate: "恭喜抽到【{gunName}】改枪码！✅",
+            // 复制失败文案
+            copyFailText: "复制失败，请手动复制！"
+        };
+        // ====================== 配置区结束（以下代码无需修改）======================
+
         // 获取核心元素
         const copyToast = document.getElementById('copyToast');
-        const textItems = document.querySelectorAll('.main-text');
         const backToTop = document.getElementById('backToTop');
         const luckyBtn = document.getElementById('luckyBtn');
         const themeBtn = document.getElementById('themeBtn');
+        const pageTitle = document.getElementById('pageTitle');
+        const pageSubTitle = document.getElementById('pageSubTitle');
+        const textGroup = document.getElementById('textGroup');
         const body = document.body;
+
+        // 初始化页面文本（从配置区读取）
+        pageTitle.textContent = config.pageTitle;
+        pageSubTitle.textContent = config.pageSubTitle;
+        luckyBtn.textContent = config.luckyBtnText;
+
+        // 动态渲染改枪码列表（从配置区gunCodes读取）
+        function renderGunCodes() {
+            textGroup.innerHTML = ''; // 清空原有内容
+            config.gunCodes.forEach(code => {
+                const item = document.createElement('div');
+                item.className = 'main-text';
+                item.textContent = code;
+                // 绑定点击复制事件
+                item.addEventListener('click', () => {
+                    copyTextToClipboard(code, item);
+                });
+                textGroup.appendChild(item);
+            });
+        }
+
+        // 初始化渲染改枪码列表
+        renderGunCodes();
 
         // ========== 1. 鼠标跟随渐变背景 ==========
         body.addEventListener('mousemove', (e) => {
@@ -416,11 +465,12 @@
                 // 动画结束后移除类，避免重复触发冲突
                 setTimeout(() => el.classList.remove('glow'), 1000);
 
-                // 幸运码弹窗文案
-                const gunName = text.split('-')[0];
-                const toastText = isLucky 
-                    ? `恭喜抽到【${gunName}】改枪码！✅` 
-                    : `复制成功 ✅`;
+                // 拼接弹窗文案（区分普通复制/幸运码）
+                let toastText = config.copySuccessText;
+                if (isLucky) {
+                    const gunName = text.split('-')[0];
+                    toastText = config.luckyCopySuccessTemplate.replace('{gunName}', gunName);
+                }
                 
                 copyToast.textContent = toastText;
                 copyToast.style.backgroundColor = 'rgba(72, 187, 120, 0.9)';
@@ -435,25 +485,23 @@
                 setTimeout(() => el.removeChild(checkIcon), 1500);
 
             } catch (err) {
-                copyToast.textContent = '复制失败，请手动复制！';
+                copyToast.textContent = config.copyFailText;
                 copyToast.style.backgroundColor = 'rgba(229, 62, 62, 0.9)';
                 copyToast.classList.add('show');
                 setTimeout(() => copyToast.classList.remove('show'), 2000);
             }
         };
 
-        // 绑定条目点击事件
-        textItems.forEach(item => {
-            item.addEventListener('click', (e) => {
-                copyTextToClipboard(item.textContent, item);
-            });
-        });
-
         // ========== 3. 随机幸运改枪码 ==========
         luckyBtn.addEventListener('click', () => {
+            // 获取渲染后的改枪码条目
+            const textItems = document.querySelectorAll('.main-text');
+            if (textItems.length === 0) return;
+            
             // 随机选一个条目
             const randomIndex = Math.floor(Math.random() * textItems.length);
             const luckyItem = textItems[randomIndex];
+            const luckyCode = config.gunCodes[randomIndex];
             
             // 触发幸运动画+光晕脉冲
             luckyItem.classList.add('lucky');
@@ -464,14 +512,14 @@
             }, 1000);
             
             // 自动复制
-            copyTextToClipboard(luckyItem.textContent, luckyItem, true);
+            copyTextToClipboard(luckyCode, luckyItem, true);
         });
 
         // ========== 4. 暗黑模式切换 ==========
         // 初始化主题（优先读取本地存储）
         const savedTheme = localStorage.getItem('theme') || 'light';
         body.setAttribute('data-theme', savedTheme);
-        themeBtn.textContent = savedTheme === 'light' ? '🌞' : '🌙';
+        themeBtn.textContent = config.themeBtnIcons[savedTheme];
 
         // 切换主题
         themeBtn.addEventListener('click', () => {
@@ -479,7 +527,7 @@
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
             body.setAttribute('data-theme', newTheme);
-            themeBtn.textContent = newTheme === 'light' ? '🌞' : '🌙';
+            themeBtn.textContent = config.themeBtnIcons[newTheme];
             
             // 保存到本地存储，刷新后保留
             localStorage.setItem('theme', newTheme);
