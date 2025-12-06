@@ -1,0 +1,505 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>theooo的改枪码</title>
+    <style>
+        /* 全局CSS变量：方便切换暗黑模式 */
+        :root {
+            /* 浅色模式 */
+            --bg-primary: linear-gradient(120deg, #f5f7fa, #e8f4f8, #f0f8fb);
+            --card-bg: #ffffff;
+            --text-primary: #2d3748;
+            --text-secondary: #718096;
+            --card-border: #e2e8f0;
+            --hover-border: #4299e1;
+            --hover-shadow: 0 4px 15px rgba(66, 153, 225, 0.1);
+            --scrollbar-thumb: linear-gradient(180deg, #4299e1, #9f7aea);
+            --scrollbar-track: #f5f7fa;
+            --title-gradient: linear-gradient(90deg, #4299e1, #9f7aea, #38b2ac);
+            --decor-line: linear-gradient(90deg, #4299e1, #9f7aea);
+            --back-to-top: #4299e1;
+            --back-to-top-hover: #3182ce;
+            /* 光晕脉冲主色 */
+            --glow-color: rgba(66, 153, 225, 0.6);
+        }
+
+        [data-theme="dark"] {
+            /* 暗黑模式 */
+            --bg-primary: linear-gradient(120deg, #1a202c, #2d3748, #1a202c);
+            --card-bg: #2d3748;
+            --text-primary: #f7fafc;
+            --text-secondary: #a0aec0;
+            --card-border: #4a5568;
+            --hover-border: #9f7aea;
+            --hover-shadow: 0 4px 15px rgba(159, 122, 234, 0.2);
+            --scrollbar-thumb: linear-gradient(180deg, #9f7aea, #4299e1);
+            --scrollbar-track: #1a202c;
+            --title-gradient: linear-gradient(90deg, #9f7aea, #4299e1, #38b2ac);
+            --decor-line: linear-gradient(90deg, #9f7aea, #4299e1);
+            --back-to-top: #9f7aea;
+            --back-to-top-hover: #805ad5;
+            /* 暗黑模式光晕色 */
+            --glow-color: rgba(159, 122, 234, 0.6);
+        }
+
+        /* 全局样式重置 */
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: "Microsoft YaHei", "PingFang SC", sans-serif;
+            transition: all 0.5s ease; /* 统一过渡动画，适配暗黑模式切换 */
+        }
+
+        /* 动态渐变背景（支持鼠标跟随） */
+        body {
+            background: var(--bg-primary);
+            background-size: 200% 200%;
+            animation: bgFlow 15s ease infinite alternate;
+            display: flex;
+            justify-content: center;
+            align-items: flex-start;
+            min-height: 100vh;
+            padding: 20px 10px;
+            overflow-x: hidden;
+        }
+
+        /* 背景流动动画 */
+        @keyframes bgFlow {
+            0% { background-position: 0% 50%; }
+            100% { background-position: 100% 50%; }
+        }
+
+        /* 功能按钮容器 */
+        .btn-group {
+            display: flex;
+            justify-content: center;
+            gap: 15px;
+            margin-bottom: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* 幸运改枪码按钮 */
+        .lucky-btn {
+            padding: 8px 20px;
+            border: none;
+            border-radius: 25px;
+            background: linear-gradient(90deg, #4299e1, #9f7aea);
+            color: white;
+            font-size: 16px;
+            font-weight: 600;
+            cursor: pointer;
+            box-shadow: 0 3px 10px rgba(66, 153, 225, 0.2);
+        }
+
+        .lucky-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(66, 153, 225, 0.3);
+        }
+
+        .lucky-btn:active {
+            transform: translateY(0);
+        }
+
+        /* 暗黑模式切换按钮 */
+        .theme-btn {
+            width: 40px;
+            height: 40px;
+            border: none;
+            border-radius: 50%;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 20px;
+            cursor: pointer;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        .theme-btn:hover {
+            transform: scale(1.1);
+        }
+
+        .content-card {
+            background-color: var(--card-bg);
+            border-radius: 16px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            padding: 40px 20px;
+            text-align: center;
+            max-width: 650px;
+            width: 100%;
+            max-height: 80vh;
+            overflow-y: auto;
+            margin-top: 20px;
+            animation: cardFadeIn 1s ease forwards;
+            opacity: 0;
+            transform: translateY(20px);
+        }
+
+        @keyframes cardFadeIn {
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* 渐变文字标题 */
+        .title {
+            font-size: 32px;
+            font-weight: 700;
+            background: var(--title-gradient);
+            -webkit-background-clip: text;
+            background-clip: text;
+            color: transparent;
+            margin-bottom: 8px;
+            line-height: 1.2;
+        }
+
+        /* 条目容器 */
+        .text-group {
+            margin: 20px 0;
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            padding: 0 10px;
+        }
+
+        /* 卡片化条目样式 */
+        .main-text {
+            font-size: 18px;
+            font-weight: 500;
+            color: var(--text-primary);
+            line-height: 1.5;
+            cursor: pointer;
+            padding: 12px 15px;
+            border-radius: 10px;
+            background-color: rgba(248, 249, 250, 0.1);
+            border: 1px solid var(--card-border);
+            text-align: left;
+            position: relative;
+            overflow: hidden;
+            transform: translateY(0);
+        }
+
+        .main-text:hover {
+            transform: translateY(-2px);
+            box-shadow: var(--hover-shadow);
+            border-color: var(--hover-border);
+            background-color: rgba(255, 255, 255, 0.05);
+        }
+
+        /* 幸运条目闪烁动画 */
+        .main-text.lucky {
+            animation: luckyFlash 1s ease-in-out;
+            border-color: #fcc367;
+            box-shadow: 0 0 15px rgba(252, 195, 103, 0.4);
+        }
+
+        @keyframes luckyFlash {
+            0%, 100% { transform: scale(1); border-color: #fcc367; }
+            50% { transform: scale(1.05); border-color: #ffd700; }
+        }
+
+        /* 光晕脉冲核心动画（极简+醒目） */
+        .main-text.glow {
+            animation: pulseGlow 1s ease-in-out 2; /* 脉冲2次，1秒完成 */
+        }
+
+        @keyframes pulseGlow {
+            0%, 100% { box-shadow: 0 0 0 rgba(0,0,0,0); }
+            50% { box-shadow: 0 0 20px var(--glow-color), 0 0 10px var(--glow-color); }
+        }
+
+        /* 点击复制成功的打勾动效 */
+        .check-icon {
+            position: absolute;
+            top: 50%;
+            right: 15px;
+            transform: translateY(-50%) scale(0);
+            font-size: 20px;
+            color: #48bb78;
+            z-index: 10;
+            animation: checkPop 0.5s ease forwards;
+        }
+
+        @keyframes checkPop {
+            0% { transform: translateY(-50%) scale(0); }
+            50% { transform: translateY(-50%) scale(1.2); }
+            100% { transform: translateY(-50%) scale(1); }
+        }
+
+        .sub-text {
+            font-size: 16px;
+            color: var(--text-secondary);
+            margin-bottom: 15px;
+        }
+
+        .decor-line {
+            width: 100px;
+            height: 4px;
+            background: var(--decor-line);
+            margin: 0 auto 20px;
+            border-radius: 4px;
+        }
+
+        /* 回到顶部按钮 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--back-to-top);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--back-to-top-hover);
+            transform: scale(1.1);
+        }
+
+        /* 响应式适配 */
+        @media (max-width: 576px) {
+            .content-card {
+                padding: 30px 15px;
+                max-height: 75vh;
+            }
+            .title {
+                font-size: 26px;
+            }
+            .main-text {
+                font-size: 16px;
+                padding: 10px 12px;
+            }
+            .lucky-btn {
+                font-size: 14px;
+                padding: 6px 16px;
+            }
+            .theme-btn {
+                width: 36px;
+                height: 36px;
+                font-size: 18px;
+            }
+            .back-to-top {
+                width: 40px;
+                height: 40px;
+                font-size: 18px;
+                bottom: 20px;
+                right: 20px;
+            }
+        }
+
+        /* 复制成功弹窗样式 */
+        .copy-toast {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%) scale(0.8);
+            background-color: rgba(72, 187, 120, 0.9);
+            color: #ffffff;
+            padding: 12px 24px;
+            border-radius: 8px;
+            font-size: 14px;
+            opacity: 0;
+            pointer-events: none;
+            z-index: 9999;
+            transition: all 0.3s ease;
+        }
+
+        .copy-toast.show {
+            opacity: 1;
+            transform: translateX(-50%) scale(1);
+        }
+
+        /* 滚动条美化 */
+        .content-card::-webkit-scrollbar {
+            width: 8px;
+        }
+        .content-card::-webkit-scrollbar-thumb {
+            background: var(--scrollbar-thumb);
+            border-radius: 4px;
+        }
+        .content-card::-webkit-scrollbar-track {
+            background-color: var(--scrollbar-track);
+            border-radius: 4px;
+        }
+    </style>
+</head>
+<body>
+    <div class="content-card">
+        <div class="decor-line"></div>
+        <h1 class="title">theooo的改枪码</h1>
+        <div class="sub-text">点击卡片复制对应改枪码 ✨</div>
+        
+        <!-- 功能按钮组 -->
+        <div class="btn-group">
+            <button class="lucky-btn" id="luckyBtn">抽幸运改枪码✨</button>
+            <button class="theme-btn" id="themeBtn">🌞</button>
+        </div>
+
+        <!-- 多条目卡片容器 -->
+        <div class="text-group" id="textGroup">
+            <div class="main-text">腾龙突击步枪-烽火地带-6IA0JQ00BAFJS4ST7C7E4</div>
+            <div class="main-text">K437突击步枪-烽火地带-6I7U2E40BAFJS4ST7C7E4</div>
+            <div class="main-text">SKS射手步枪-烽火地带-6I9VVTC0BAFJS4ST7C7E4</div>
+            <div class="main-text">QJB201轻机枪-烽火地带-6I9MQHO0BAFJS4ST7C7E4</div>
+            <div class="main-text">SR-3M紧凑突击步枪-烽火地带-6I9P71C01TBN8TTTF638O</div>
+            <div class="main-text">SR-25射手步枪-烽火地带-6I9VVGO0BAFJS4ST7C7E4</div>
+            <div class="main-text">AS Val突击步枪-烽火地带-6I9P3H801TBN8TTTF638O</div>
+            <div class="main-text">M4A1突击步枪-烽火地带-6I9MONG0BAFJS4ST7C7E4</div>
+            <div class="main-text">M4A1无突击步枪-烽火地带-6I8UN2C0BAFJS4ST7C7E4</div>
+            <div class="main-text">ASh-12战斗步枪-烽火地带-6I9TI4001TBN8TTTF638O</div>
+            <div class="main-text">G3战斗步枪-烽火地带-6IC032S0BAFJS4ST7C7E4</div>
+            <div class="main-text">AK-12突击步枪-烽火地带-6ICIJFO0BAFJS4ST7C7E4</div>
+            <div class="main-text">QBZ95-1突击步枪-烽火地带-6IC02U00BAFJS4ST7C7E4</div>
+            <div class="main-text">MK47突击步枪-烽火地带-6IC03V00BAFJS4ST7C7E4</div>
+            <div class="main-text">勇士冲锋枪-烽火地带-6IC06NC0BAFJS4ST7C7E4</div>
+            <div class="main-text">AKM突击步枪-烽火地带-6IC07SC0BAFJS4ST7C7E4</div>
+            <div class="main-text">MP7冲锋枪-烽火地带-6IC08EC0BAFJS4ST7C7E4</div>
+            <div class="main-text">MP7冲锋枪-烽火地带-6IC08RG0BAFJS4ST7C7E4</div>
+            <div class="main-text">SMG-45冲锋枪-烽火地带-6IC7TIK0BAFJS4ST7C7E4</div>
+            <div class="main-text">S12K霰弹枪-烽火地带-6IC7UC40BAFJS4ST7C7E4</div>
+            <div class="main-text">杠杆式步枪-烽火地带-6ICAJR801TBN8TTTF638O</div>
+            <div class="main-text">PKM通用机枪-烽火地带-6ICAKG401TBN8TTTF638O</div>
+            <div class="main-text">M250通用机枪-烽火地带-6ICAMDC01TBN8TTTF638O</div>
+            <div class="main-text">AUG突击步枪-烽火地带-6ICAN4801TBN8TTTF638O</div>
+            <div class="main-text">M14射手步枪-烽火地带-6ICAP4O01TBN8TTTF638O</div>
+            <div class="main-text">SVD狙击步枪-烽火地带-6ICAQH801TBN8TTTF638O</div>
+            <div class="main-text">PTR-32突击步枪-烽火地带-6ICHDNC0BAFJS4ST7C7E4</div>
+            <div class="main-text">K416突击步枪-烽火地带-6ICIHD80BAFJS4ST7C7E4</div>
+            <div class="main-text">KC17突击步枪-烽火地带-6ICII6S0BAFJS4ST7C7E4</div>
+        </div>
+        <div class="decor-line"></div>
+    </div>
+
+    <!-- 复制成功弹窗 -->
+    <div class="copy-toast" id="copyToast">复制成功！</div>
+    <!-- 回到顶部按钮 -->
+    <button class="back-to-top" id="backToTop">↑</button>
+
+    <script>
+        // 获取核心元素
+        const copyToast = document.getElementById('copyToast');
+        const textItems = document.querySelectorAll('.main-text');
+        const backToTop = document.getElementById('backToTop');
+        const luckyBtn = document.getElementById('luckyBtn');
+        const themeBtn = document.getElementById('themeBtn');
+        const body = document.body;
+
+        // ========== 1. 鼠标跟随渐变背景 ==========
+        body.addEventListener('mousemove', (e) => {
+            // 计算鼠标位置占视口的比例，控制背景偏移（最大10%）
+            const x = e.clientX / window.innerWidth * 10;
+            const y = e.clientY / window.innerHeight * 10;
+            body.style.backgroundPosition = `${x}% ${y}%`;
+        });
+
+        // ========== 2. 复制功能（适配光晕脉冲特效） ==========
+        const copyTextToClipboard = async (text, el, isLucky = false) => {
+            try {
+                await navigator.clipboard.writeText(text.trim());
+                
+                // 触发光晕脉冲动画
+                el.classList.add('glow');
+                // 动画结束后移除类，避免重复触发冲突
+                setTimeout(() => el.classList.remove('glow'), 1000);
+
+                // 幸运码弹窗文案
+                const gunName = text.split('-')[0];
+                const toastText = isLucky 
+                    ? `恭喜抽到【${gunName}】改枪码！✅` 
+                    : `复制成功 ✅`;
+                
+                copyToast.textContent = toastText;
+                copyToast.style.backgroundColor = 'rgba(72, 187, 120, 0.9)';
+                copyToast.classList.add('show');
+                setTimeout(() => copyToast.classList.remove('show'), 2000);
+
+                // 点击打勾反馈
+                const checkIcon = document.createElement('span');
+                checkIcon.className = 'check-icon';
+                checkIcon.innerHTML = '✓';
+                el.appendChild(checkIcon);
+                setTimeout(() => el.removeChild(checkIcon), 1500);
+
+            } catch (err) {
+                copyToast.textContent = '复制失败，请手动复制！';
+                copyToast.style.backgroundColor = 'rgba(229, 62, 62, 0.9)';
+                copyToast.classList.add('show');
+                setTimeout(() => copyToast.classList.remove('show'), 2000);
+            }
+        };
+
+        // 绑定条目点击事件
+        textItems.forEach(item => {
+            item.addEventListener('click', (e) => {
+                copyTextToClipboard(item.textContent, item);
+            });
+        });
+
+        // ========== 3. 随机幸运改枪码 ==========
+        luckyBtn.addEventListener('click', () => {
+            // 随机选一个条目
+            const randomIndex = Math.floor(Math.random() * textItems.length);
+            const luckyItem = textItems[randomIndex];
+            
+            // 触发幸运动画+光晕脉冲
+            luckyItem.classList.add('lucky');
+            luckyItem.classList.add('glow');
+            setTimeout(() => {
+                luckyItem.classList.remove('lucky');
+                luckyItem.classList.remove('glow');
+            }, 1000);
+            
+            // 自动复制
+            copyTextToClipboard(luckyItem.textContent, luckyItem, true);
+        });
+
+        // ========== 4. 暗黑模式切换 ==========
+        // 初始化主题（优先读取本地存储）
+        const savedTheme = localStorage.getItem('theme') || 'light';
+        body.setAttribute('data-theme', savedTheme);
+        themeBtn.textContent = savedTheme === 'light' ? '🌞' : '🌙';
+
+        // 切换主题
+        themeBtn.addEventListener('click', () => {
+            const currentTheme = body.getAttribute('data-theme');
+            const newTheme = currentTheme === 'light' ? 'dark' : 'light';
+            
+            body.setAttribute('data-theme', newTheme);
+            themeBtn.textContent = newTheme === 'light' ? '🌞' : '🌙';
+            
+            // 保存到本地存储，刷新后保留
+            localStorage.setItem('theme', newTheme);
+        });
+
+        // ========== 5. 回到顶部功能 ==========
+        window.addEventListener('scroll', () => {
+            if (window.scrollY > 300) {
+                backToTop.classList.add('show');
+            } else {
+                backToTop.classList.remove('show');
+            }
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth'
+            });
+        });
+    </script>
+</body>
+</html>
