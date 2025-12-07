@@ -21,8 +21,9 @@
             --decor-line: linear-gradient(90deg, #4299e1, #9f7aea);
             --back-to-top: #4299e1;
             --back-to-top-hover: #3182ce;
-            /* 光晕脉冲主色 */
-            --glow-color: rgba(66, 153, 225, 0.6);
+            /* 动态渐变填充（默认值，会被JS覆盖） */
+            --random-fill-gradient: linear-gradient(90deg, #4299e1, #9f7aea, #38b2ac);
+            --fill-bg: rgba(255, 255, 255, 0.8);
         }
 
         [data-theme="dark"] {
@@ -40,8 +41,9 @@
             --decor-line: linear-gradient(90deg, #9f7aea, #4299e1);
             --back-to-top: #9f7aea;
             --back-to-top-hover: #805ad5;
-            /* 暗黑模式光晕色 */
-            --glow-color: rgba(159, 122, 234, 0.6);
+            /* 动态渐变填充（默认值，会被JS覆盖） */
+            --random-fill-gradient: linear-gradient(90deg, #9f7aea, #4299e1, #38b2ac);
+            --fill-bg: rgba(45, 55, 72, 0.8);
         }
 
         /* 全局样式重置 */
@@ -164,7 +166,7 @@
             padding: 0 10px;
         }
 
-        /* 卡片化条目样式 */
+        /* 卡片化条目样式（动态渐变填充层） */
         .main-text {
             font-size: 18px;
             font-weight: 500;
@@ -179,6 +181,24 @@
             position: relative;
             overflow: hidden;
             transform: translateY(0);
+            /* 为渐变填充层预留层级 */
+            z-index: 1;
+            /* 初始化随机渐变变量 */
+            --random-fill-gradient: linear-gradient(90deg, #4299e1, #9f7aea, #38b2ac);
+        }
+        /* 动态渐变填充层（伪元素） */
+        .main-text::before {
+            content: "";
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: var(--random-fill-gradient);
+            opacity: 0.2;
+            z-index: -1;
+            border-radius: 10px;
+            transition: none; /* 动画由关键帧控制 */
         }
 
         .main-text:hover {
@@ -200,14 +220,14 @@
             50% { transform: scale(1.05); border-color: #ffd700; }
         }
 
-        /* 光晕脉冲核心动画（极简+醒目） */
-        .main-text.glow {
-            animation: pulseGlow 1s ease-in-out 2; /* 脉冲2次，1秒完成 */
+        /* 随机渐变填充动画 */
+        .main-text.fill::before {
+            animation: gradientFillPseudo 1s ease-in-out forwards;
         }
-
-        @keyframes pulseGlow {
-            0%, 100% { box-shadow: 0 0 0 rgba(0,0,0,0); }
-            50% { box-shadow: 0 0 20px var(--glow-color), 0 0 10px var(--glow-color); }
+        @keyframes gradientFillPseudo {
+            0% { width: 0; opacity: 0.2; }
+            50% { width: 100%; opacity: 0.3; }
+            100% { width: 100%; opacity: 0.1; }
         }
 
         /* 点击复制成功的打勾动效 */
@@ -447,6 +467,22 @@
         // 初始化渲染改枪码列表
         renderGunCodes();
 
+        // ========== 核心新增：生成随机渐变颜色的函数 ==========
+        function generateRandomGradient() {
+            // 随机生成3个柔和的RGB颜色（避免过暗/过亮，适配文字可读性）
+            const getRandomColor = () => {
+                // 限定颜色范围：R/G/B在50-220之间，保证柔和且不刺眼
+                const r = Math.floor(Math.random() * 170) + 50;
+                const g = Math.floor(Math.random() * 170) + 50;
+                const b = Math.floor(Math.random() * 170) + 50;
+                return `rgb(${r}, ${g}, ${b})`;
+            };
+            // 随机渐变方向（0-360度）
+            const angle = Math.floor(Math.random() * 360);
+            // 生成3色线性渐变
+            return `linear-gradient(${angle}deg, ${getRandomColor()}, ${getRandomColor()}, ${getRandomColor()})`;
+        }
+
         // ========== 1. 鼠标跟随渐变背景 ==========
         body.addEventListener('mousemove', (e) => {
             // 计算鼠标位置占视口的比例，控制背景偏移（最大10%）
@@ -455,15 +491,19 @@
             body.style.backgroundPosition = `${x}% ${y}%`;
         });
 
-        // ========== 2. 复制功能（适配光晕脉冲特效） ==========
+        // ========== 2. 复制功能（核心：每次复制生成随机渐变） ==========
         const copyTextToClipboard = async (text, el, isLucky = false) => {
             try {
                 await navigator.clipboard.writeText(text.trim());
                 
-                // 触发光晕脉冲动画
-                el.classList.add('glow');
+                // 核心步骤1：生成随机渐变并绑定到元素的CSS变量
+                const randomGradient = generateRandomGradient();
+                el.style.setProperty('--random-fill-gradient', randomGradient);
+                
+                // 核心步骤2：触发渐变填充动画
+                el.classList.add('fill');
                 // 动画结束后移除类，避免重复触发冲突
-                setTimeout(() => el.classList.remove('glow'), 1000);
+                setTimeout(() => el.classList.remove('fill'), 1000);
 
                 // 拼接弹窗文案（区分普通复制/幸运码）
                 let toastText = config.copySuccessText;
@@ -492,7 +532,7 @@
             }
         };
 
-        // ========== 3. 随机幸运改枪码 ==========
+        // ========== 3. 随机幸运改枪码（同步随机渐变） ==========
         luckyBtn.addEventListener('click', () => {
             // 获取渲染后的改枪码条目
             const textItems = document.querySelectorAll('.main-text');
@@ -503,12 +543,16 @@
             const luckyItem = textItems[randomIndex];
             const luckyCode = config.gunCodes[randomIndex];
             
-            // 触发幸运动画+光晕脉冲
+            // 生成随机渐变并绑定
+            const randomGradient = generateRandomGradient();
+            luckyItem.style.setProperty('--random-fill-gradient', randomGradient);
+            
+            // 触发幸运动画+渐变填充动画
             luckyItem.classList.add('lucky');
-            luckyItem.classList.add('glow');
+            luckyItem.classList.add('fill');
             setTimeout(() => {
                 luckyItem.classList.remove('lucky');
-                luckyItem.classList.remove('glow');
+                luckyItem.classList.remove('fill');
             }, 1000);
             
             // 自动复制
