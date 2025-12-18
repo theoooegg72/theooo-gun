@@ -81,6 +81,67 @@
             gap: 15px;
             margin-bottom: 15px;
             flex-wrap: wrap;
+            align-items: center;
+        }
+
+        /* 搜索容器样式 */
+        .search-container {
+            position: relative;
+            flex: 1;
+            max-width: 300px;
+        }
+
+        /* 搜索输入框 */
+        .search-input {
+            width: 100%;
+            padding: 8px 15px;
+            padding-right: 35px; /* 给清除按钮留空间 */
+            border: 1px solid var(--card-border);
+            border-radius: 25px;
+            background-color: var(--card-bg);
+            color: var(--text-primary);
+            font-size: 14px;
+            outline: none;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+        }
+
+        .search-input::placeholder {
+            color: var(--text-secondary);
+            opacity: 0.8;
+        }
+
+        .search-input:focus {
+            border-color: var(--hover-border);
+            box-shadow: 0 0 0 2px rgba(66, 153, 225, 0.1);
+        }
+
+        /* 清除搜索按钮 */
+        .clear-search-btn {
+            position: absolute;
+            right: 10px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 20px;
+            height: 20px;
+            border: none;
+            background: transparent;
+            color: var(--text-secondary);
+            font-size: 16px;
+            cursor: pointer;
+            display: none; /* 默认隐藏 */
+            align-items: center;
+            justify-content: center;
+            padding: 0;
+            line-height: 1;
+        }
+
+        .clear-search-btn.show {
+            display: flex;
+        }
+
+        .clear-search-btn:hover {
+            color: var(--text-primary);
+            transform: translateY(-50%) scale(1.1);
         }
 
         /* 幸运改枪码按钮 */
@@ -319,6 +380,16 @@
                 bottom: 20px;
                 right: 20px;
             }
+            /* 移动端搜索框占满宽度 */
+            .search-container {
+                max-width: 100%;
+                width: 100%;
+                margin-bottom: 10px;
+            }
+            .btn-group {
+                flex-direction: column;
+                align-items: stretch;
+            }
         }
 
         /* 复制成功弹窗样式 */
@@ -363,8 +434,12 @@
         <h1 class="title" id="pageTitle"></h1>
         <div class="sub-text" id="pageSubTitle"></div>
         
-        <!-- 功能按钮组 -->
+        <!-- 功能按钮组（新增搜索框） -->
         <div class="btn-group">
+            <div class="search-container">
+                <input type="text" class="search-input" id="searchInput" placeholder="搜索枪械名称/改枪码...">
+                <button class="clear-search-btn" id="clearSearchBtn">×</button>
+            </div>
             <button class="lucky-btn" id="luckyBtn"></button>
             <button class="theme-btn" id="themeBtn">🌞</button>
         </div>
@@ -393,6 +468,10 @@
                 light: "🌞",
                 dark: "🌙"
             },
+            // 搜索框占位符
+            searchPlaceholder: "搜索枪械名称/改枪码...",
+            // 无搜索结果提示文本
+            searchEmptyText: "未找到匹配的改枪码 😞",
             // 改枪码列表（增删/修改只需改这个数组）
             gunCodes: [
                 "腾龙突击步枪-烽火地带-6IA0JQ00BAFJS4ST7C7E4",
@@ -458,31 +537,89 @@
         const pageSubTitle = document.getElementById('pageSubTitle');
         const textGroup = document.getElementById('textGroup');
         const body = document.body;
+        // 新增搜索相关元素
+        const searchInput = document.getElementById('searchInput');
+        const clearSearchBtn = document.getElementById('clearSearchBtn');
 
         // 初始化页面文本（从配置区读取）
         pageTitle.textContent = config.pageTitle;
         pageSubTitle.textContent = config.pageSubTitle;
         luckyBtn.textContent = config.luckyBtnText;
+        searchInput.placeholder = config.searchPlaceholder || "搜索枪械名称/改枪码...";
 
-        // 动态渲染改枪码列表（从配置区gunCodes读取）
-        function renderGunCodes() {
+        // 动态渲染改枪码列表（支持过滤）
+        function renderGunCodes(filteredCodes = null) {
             textGroup.innerHTML = ''; // 清空原有内容
-            config.gunCodes.forEach(code => {
-                const item = document.createElement('div');
-                item.className = 'main-text';
-                item.textContent = code;
-                // 绑定点击复制事件
-                item.addEventListener('click', () => {
-                    copyTextToClipboard(code, item);
+            // 如果没有过滤列表，使用原始列表
+            const codesToRender = filteredCodes || config.gunCodes;
+            
+            // 有匹配结果时渲染列表
+            if (codesToRender.length > 0) {
+                codesToRender.forEach(code => {
+                    const item = document.createElement('div');
+                    item.className = 'main-text';
+                    item.textContent = code;
+                    // 绑定点击复制事件
+                    item.addEventListener('click', () => {
+                        copyTextToClipboard(code, item);
+                    });
+                    textGroup.appendChild(item);
                 });
-                textGroup.appendChild(item);
-            });
+            } else {
+                // 无匹配结果时显示提示
+                const emptyTip = document.createElement('div');
+                emptyTip.className = 'main-text';
+                emptyTip.style.textAlign = 'center';
+                emptyTip.style.color = 'var(--text-secondary)';
+                emptyTip.style.cursor = 'default';
+                emptyTip.textContent = config.searchEmptyText || '未找到匹配的改枪码 😞';
+                // 移除无结果提示的点击事件和hover效果
+                emptyTip.addEventListener('click', (e) => e.preventDefault());
+                emptyTip.style.pointerEvents = 'none';
+                textGroup.appendChild(emptyTip);
+            }
         }
 
         // 初始化渲染改枪码列表
         renderGunCodes();
 
-        // ========== 核心新增：生成随机渐变颜色的函数 ==========
+        // ========== 新增：搜索功能逻辑 ==========
+        function handleSearch() {
+            const keyword = searchInput.value.trim().toLowerCase();
+            // 显示/隐藏清除按钮
+            if (keyword) {
+                clearSearchBtn.classList.add('show');
+                // 过滤改枪码（不区分大小写）
+                const filtered = config.gunCodes.filter(code => 
+                    code.toLowerCase().includes(keyword)
+                );
+                renderGunCodes(filtered);
+            } else {
+                clearSearchBtn.classList.remove('show');
+                // 清空搜索，恢复所有条目
+                renderGunCodes();
+            }
+        }
+
+        // 监听搜索输入（实时过滤）
+        searchInput.addEventListener('input', handleSearch);
+        // 清除搜索按钮点击事件
+        clearSearchBtn.addEventListener('click', () => {
+            searchInput.value = '';
+            clearSearchBtn.classList.remove('show');
+            renderGunCodes();
+            // 聚焦输入框提升体验
+            searchInput.focus();
+        });
+        // 按回车触发搜索（可选增强）
+        searchInput.addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                handleSearch();
+                searchInput.blur(); // 失焦收起键盘（移动端）
+            }
+        });
+
+        // ========== 生成随机渐变颜色的函数 ==========
         function generateRandomGradient() {
             // 随机生成3个柔和的RGB颜色（避免过暗/过亮，适配文字可读性）
             const getRandomColor = () => {
@@ -498,7 +635,7 @@
             return `linear-gradient(${angle}deg, ${getRandomColor()}, ${getRandomColor()}, ${getRandomColor()})`;
         }
 
-        // ========== 1. 鼠标跟随渐变背景 ==========
+        // ========== 鼠标跟随渐变背景 ==========
         body.addEventListener('mousemove', (e) => {
             // 计算鼠标位置占视口的比例，控制背景偏移（最大10%）
             const x = e.clientX / window.innerWidth * 10;
@@ -506,16 +643,16 @@
             body.style.backgroundPosition = `${x}% ${y}%`;
         });
 
-        // ========== 2. 复制功能（核心：每次复制生成随机渐变） ==========
+        // ========== 复制功能 ==========
         const copyTextToClipboard = async (text, el, isLucky = false) => {
             try {
                 await navigator.clipboard.writeText(text.trim());
                 
-                // 核心步骤1：生成随机渐变并绑定到元素的CSS变量
+                // 生成随机渐变并绑定到元素的CSS变量
                 const randomGradient = generateRandomGradient();
                 el.style.setProperty('--random-fill-gradient', randomGradient);
                 
-                // 核心步骤2：触发渐变填充动画
+                // 触发渐变填充动画
                 el.classList.add('fill');
                 // 动画结束后移除类，避免重复触发冲突
                 setTimeout(() => el.classList.remove('fill'), 1000);
@@ -547,16 +684,16 @@
             }
         };
 
-        // ========== 3. 随机幸运改枪码（同步随机渐变） ==========
+        // ========== 随机幸运改枪码 ==========
         luckyBtn.addEventListener('click', () => {
             // 获取渲染后的改枪码条目
             const textItems = document.querySelectorAll('.main-text');
-            if (textItems.length === 0) return;
+            if (textItems.length === 0 || textItems[0].textContent === config.searchEmptyText) return;
             
             // 随机选一个条目
             const randomIndex = Math.floor(Math.random() * textItems.length);
             const luckyItem = textItems[randomIndex];
-            const luckyCode = config.gunCodes[randomIndex];
+            const luckyCode = luckyItem.textContent;
             
             // 生成随机渐变并绑定
             const randomGradient = generateRandomGradient();
@@ -574,7 +711,7 @@
             copyTextToClipboard(luckyCode, luckyItem, true);
         });
 
-        // ========== 4. 暗黑模式切换 ==========
+        // ========== 暗黑模式切换 ==========
         // 初始化主题（优先读取本地存储）
         const savedTheme = localStorage.getItem('theme') || 'light';
         body.setAttribute('data-theme', savedTheme);
@@ -592,7 +729,7 @@
             localStorage.setItem('theme', newTheme);
         });
 
-        // ========== 5. 回到顶部功能 ==========
+        // ========== 回到顶部功能 ==========
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
                 backToTop.classList.add('show');
@@ -607,21 +744,9 @@
                 behavior: 'smooth'
             });
         });
+
+        // 初始化时隐藏清除按钮
+        clearSearchBtn.classList.remove('show');
     </script>
 </body>
 </html>
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
