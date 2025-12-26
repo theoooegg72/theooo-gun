@@ -7,43 +7,41 @@
     <style>
         /* 全局CSS变量：方便切换暗黑模式 */
         :root {
-            /* 浅色模式 */
-            --bg-primary: linear-gradient(120deg, #f5f7fa, #e8f4f8, #f0f8fb);
-            --card-bg: #ffffff;
+            /* 浅色模式 - 冷色系多彩渐变背景 */
+            --bg-primary: linear-gradient(120deg, #e0f7fa, #e1f5fe, #f3e5f5, #e8eaf6, #f0f8fb);
+            --card-bg: rgba(255, 255, 255, 0.2); /* 卡片透明化 */
             --text-primary: #2d3748;
             --text-secondary: #718096;
-            --card-border: #e2e8f0;
+            --card-border: rgba(226, 232, 240, 0.6); /* 边框半透明 */
             --hover-border: #4299e1;
-            --hover-shadow: 0 4px 15px rgba(66, 153, 225, 0.1);
-            --scrollbar-thumb: linear-gradient(180deg, #4299e1, #9f7aea);
-            --scrollbar-track: #f5f7fa;
-            --title-gradient: linear-gradient(90deg, #4299e1, #9f7aea, #38b2ac);
-            --decor-line: linear-gradient(90deg, #4299e1, #9f7aea);
-            --back-to-top: #4299e1;
-            --back-to-top-hover: #3182ce;
-            /* 动态渐变填充（默认值，会被JS覆盖） */
-            --random-fill-gradient: linear-gradient(90deg, #4299e1, #9f7aea, #38b2ac);
-            --fill-bg: rgba(255, 255, 255, 0.8);
+            --hover-shadow: 0 4px 15px rgba(66, 153, 225, 0.15);
+            --scrollbar-thumb: linear-gradient(180deg, #4299e1, #9f7aea, #26a69a);
+            --scrollbar-track: rgba(245, 247, 250, 0.3);
+            --title-gradient: linear-gradient(90deg, #0288d1, #7e57c2, #26a69a, #039be5);
+            --decor-line: linear-gradient(90deg, #0288d1, #7e57c2, #26a69a);
+            --back-to-top: #0288d1;
+            --back-to-top-hover: #0277bd;
+            --random-fill-gradient: linear-gradient(90deg, #0288d1, #7e57c2, #26a69a);
+            --fill-bg: rgba(255, 255, 255, 0.4);
         }
 
         [data-theme="dark"] {
-            /* 暗黑模式 */
-            --bg-primary: linear-gradient(120deg, #1a202c, #2d3748, #1a202c);
-            --card-bg: #2d3748;
+            /* 暗黑模式 - 冷色系多彩渐变背景 */
+            --bg-primary: linear-gradient(120deg, #0f172a, #1e293b, #1a103d, #1e1b4b, #0f172a);
+            --card-bg: rgba(45, 55, 72, 0.2); /* 卡片透明化 */
             --text-primary: #f7fafc;
             --text-secondary: #a0aec0;
-            --card-border: #4a5568;
+            --card-border: rgba(74, 85, 104, 0.6); /* 边框半透明 */
             --hover-border: #9f7aea;
-            --hover-shadow: 0 4px 15px rgba(159, 122, 234, 0.2);
-            --scrollbar-thumb: linear-gradient(180deg, #9f7aea, #4299e1);
-            --scrollbar-track: #1a202c;
-            --title-gradient: linear-gradient(90deg, #9f7aea, #4299e1, #38b2ac);
-            --decor-line: linear-gradient(90deg, #9f7aea, #4299e1);
+            --hover-shadow: 0 4px 15px rgba(159, 122, 234, 0.25);
+            --scrollbar-thumb: linear-gradient(180deg, #9f7aea, #4299e1, #26a69a);
+            --scrollbar-track: rgba(26, 32, 44, 0.3);
+            --title-gradient: linear-gradient(90deg, #9f7aea, #4299e1, #26a69a, #039be5);
+            --decor-line: linear-gradient(90deg, #9f7aea, #4299e1, #26a69a);
             --back-to-top: #9f7aea;
             --back-to-top-hover: #805ad5;
-            /* 动态渐变填充（默认值，会被JS覆盖） */
-            --random-fill-gradient: linear-gradient(90deg, #9f7aea, #4299e1, #38b2ac);
-            --fill-bg: rgba(45, 55, 72, 0.8);
+            --random-fill-gradient: linear-gradient(90deg, #9f7aea, #4299e1, #26a69a);
+            --fill-bg: rgba(45, 55, 72, 0.4);
         }
 
         /* 全局样式重置 */
@@ -55,22 +53,37 @@
             transition: all 0.5s ease; /* 统一过渡动画，适配暗黑模式切换 */
         }
 
+        /* 粒子画布样式 */
+        #particleCanvas {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100vw;
+            height: 100vh;
+            pointer-events: none; /* 不阻挡鼠标交互 */
+            z-index: 0; /* 放在最底层 */
+        }
+
         /* 动态渐变背景（支持鼠标跟随） */
         body {
             background: var(--bg-primary);
-            background-size: 200% 200%;
-            animation: bgFlow 15s ease infinite alternate;
+            background-size: 400% 400%; /* 扩大背景尺寸，让渐变流动更明显 */
+            animation: bgFlow 20s ease infinite alternate;
             display: flex;
             justify-content: center;
             align-items: flex-start;
             min-height: 100vh;
             padding: 20px 10px;
             overflow-x: hidden;
+            position: relative; /* 为粒子画布定位做准备 */
         }
 
-        /* 背景流动动画 */
+        /* 背景流动动画 - 加快速度，增强多彩效果 */
         @keyframes bgFlow {
             0% { background-position: 0% 50%; }
+            25% { background-position: 25% 75%; }
+            50% { background-position: 50% 25%; }
+            75% { background-position: 75% 75%; }
             100% { background-position: 100% 50%; }
         }
 
@@ -82,6 +95,8 @@
             margin-bottom: 15px;
             flex-wrap: wrap;
             align-items: center;
+            position: relative;
+            z-index: 1; /* 按钮在粒子上层 */
         }
 
         /* 搜索容器样式 */
@@ -91,14 +106,15 @@
             max-width: 300px;
         }
 
-        /* 搜索输入框 */
+        /* 搜索输入框 - 增加透明感 */
         .search-input {
             width: 100%;
             padding: 8px 15px;
-            padding-right: 35px; /* 给清除按钮留空间 */
+            padding-right: 35px;
             border: 1px solid var(--card-border);
             border-radius: 25px;
-            background-color: var(--card-bg);
+            background-color: rgba(255, 255, 255, 0.15); /* 输入框透明 */
+            backdrop-filter: blur(8px); /* 毛玻璃效果 */
             color: var(--text-primary);
             font-size: 14px;
             outline: none;
@@ -128,7 +144,7 @@
             color: var(--text-secondary);
             font-size: 16px;
             cursor: pointer;
-            display: none; /* 默认隐藏 */
+            display: none;
             align-items: center;
             justify-content: center;
             padding: 0;
@@ -144,17 +160,19 @@
             transform: translateY(-50%) scale(1.1);
         }
 
-        /* 幸运改枪码按钮 */
+        /* 幸运改枪码按钮 - 冷色系渐变 */
         .lucky-btn {
             padding: 8px 20px;
             border: none;
             border-radius: 25px;
-            background: linear-gradient(90deg, #4299e1, #9f7aea);
+            background: linear-gradient(90deg, #0288d1, #7e57c2, #26a69a);
             color: white;
             font-size: 16px;
             font-weight: 600;
             cursor: pointer;
             box-shadow: 0 3px 10px rgba(66, 153, 225, 0.2);
+            position: relative;
+            z-index: 1;
         }
 
         .lucky-btn:hover {
@@ -172,19 +190,24 @@
             height: 40px;
             border: none;
             border-radius: 50%;
-            background-color: var(--card-bg);
+            background-color: rgba(255, 255, 255, 0.15); /* 按钮透明 */
+            backdrop-filter: blur(8px); /* 毛玻璃效果 */
             color: var(--text-primary);
             font-size: 20px;
             cursor: pointer;
             box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+            position: relative;
+            z-index: 1;
         }
 
         .theme-btn:hover {
             transform: scale(1.1);
         }
 
+        /* 主卡片 - 透明化+毛玻璃 */
         .content-card {
             background-color: var(--card-bg);
+            backdrop-filter: blur(15px); /* 毛玻璃效果，增强透明质感 */
             border-radius: 16px;
             box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
             padding: 40px 20px;
@@ -197,6 +220,8 @@
             animation: cardFadeIn 1s ease forwards;
             opacity: 0;
             transform: translateY(20px);
+            position: relative;
+            z-index: 1; /* 卡片在粒子上层 */
         }
 
         @keyframes cardFadeIn {
@@ -206,7 +231,7 @@
             }
         }
 
-        /* 渐变文字标题 */
+        /* 渐变文字标题 - 冷色系增强 */
         .title {
             font-size: 32px;
             font-weight: 700;
@@ -216,6 +241,8 @@
             color: transparent;
             margin-bottom: 8px;
             line-height: 1.2;
+            position: relative;
+            z-index: 1;
         }
 
         /* 条目容器 */
@@ -225,9 +252,11 @@
             flex-direction: column;
             gap: 12px;
             padding: 0 10px;
+            position: relative;
+            z-index: 1;
         }
 
-        /* 卡片化条目样式（动态渐变填充层） */
+        /* 卡片化条目样式 - 透明化 */
         .main-text {
             font-size: 18px;
             font-weight: 500;
@@ -236,17 +265,17 @@
             cursor: pointer;
             padding: 12px 15px;
             border-radius: 10px;
-            background-color: rgba(248, 249, 250, 0.1);
+            background-color: rgba(255, 255, 255, 0.08); /* 条目透明 */
+            backdrop-filter: blur(8px); /* 毛玻璃效果 */
             border: 1px solid var(--card-border);
             text-align: left;
             position: relative;
             overflow: hidden;
             transform: translateY(0);
-            /* 为渐变填充层预留层级 */
             z-index: 1;
-            /* 初始化随机渐变变量 */
-            --random-fill-gradient: linear-gradient(90deg, #4299e1, #9f7aea, #38b2ac);
+            --random-fill-gradient: linear-gradient(90deg, #0288d1, #7e57c2, #26a69a);
         }
+        
         /* 动态渐变填充层（伪元素） */
         .main-text::before {
             content: "";
@@ -259,26 +288,26 @@
             opacity: 0.2;
             z-index: -1;
             border-radius: 10px;
-            transition: none; /* 动画由关键帧控制 */
+            transition: none;
         }
 
         .main-text:hover {
             transform: translateY(-2px);
             box-shadow: var(--hover-shadow);
             border-color: var(--hover-border);
-            background-color: rgba(255, 255, 255, 0.05);
+            background-color: rgba(255, 255, 255, 0.12);
         }
 
         /* 幸运条目闪烁动画 */
         .main-text.lucky {
             animation: luckyFlash 1s ease-in-out;
-            border-color: #fcc367;
-            box-shadow: 0 0 15px rgba(252, 195, 103, 0.4);
+            border-color: #81d4fa; /* 冷色系高亮 */
+            box-shadow: 0 0 15px rgba(129, 212, 250, 0.4);
         }
 
         @keyframes luckyFlash {
-            0%, 100% { transform: scale(1); border-color: #fcc367; }
-            50% { transform: scale(1.05); border-color: #ffd700; }
+            0%, 100% { transform: scale(1); border-color: #81d4fa; }
+            50% { transform: scale(1.05); border-color: #4fc3f7; }
         }
 
         /* 随机渐变填充动画 */
@@ -313,6 +342,8 @@
             font-size: 16px;
             color: var(--text-secondary);
             margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
         }
 
         .decor-line {
@@ -321,34 +352,8 @@
             background: var(--decor-line);
             margin: 0 auto 20px;
             border-radius: 4px;
-        }
-
-        /* 回到顶部按钮 */
-        .back-to-top {
-            position: fixed;
-            bottom: 30px;
-            right: 30px;
-            width: 45px;
-            height: 45px;
-            border-radius: 50%;
-            background-color: var(--back-to-top);
-            color: white;
-            border: none;
-            font-size: 20px;
-            cursor: pointer;
-            opacity: 0;
-            pointer-events: none;
-            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
-        }
-
-        .back-to-top.show {
-            opacity: 1;
-            pointer-events: all;
-        }
-
-        .back-to-top:hover {
-            background-color: var(--back-to-top-hover);
-            transform: scale(1.1);
+            position: relative;
+            z-index: 1;
         }
 
         /* 响应式适配 */
@@ -356,6 +361,7 @@
             .content-card {
                 padding: 30px 15px;
                 max-height: 75vh;
+                backdrop-filter: blur(10px); /* 移动端降低毛玻璃强度 */
             }
             .title {
                 font-size: 26px;
@@ -380,7 +386,6 @@
                 bottom: 20px;
                 right: 20px;
             }
-            /* 移动端搜索框占满宽度 */
             .search-container {
                 max-width: 100%;
                 width: 100%;
@@ -426,15 +431,47 @@
             background-color: var(--scrollbar-track);
             border-radius: 4px;
         }
+
+        /* 回到顶部按钮 - 透明化 */
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 45px;
+            height: 45px;
+            border-radius: 50%;
+            background-color: var(--back-to-top);
+            color: white;
+            border: none;
+            font-size: 20px;
+            cursor: pointer;
+            opacity: 0;
+            pointer-events: none;
+            box-shadow: 0 4px 10px rgba(66, 153, 225, 0.3);
+            z-index: 999;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            pointer-events: all;
+        }
+
+        .back-to-top:hover {
+            background-color: var(--back-to-top-hover);
+            transform: scale(1.1);
+        }
     </style>
 </head>
 <body>
+    <!-- 粒子画布 - 新增 -->
+    <canvas id="particleCanvas"></canvas>
+
     <div class="content-card">
         <div class="decor-line"></div>
         <h1 class="title" id="pageTitle"></h1>
         <div class="sub-text" id="pageSubTitle"></div>
         
-        <!-- 功能按钮组（新增搜索框） -->
+        <!-- 功能按钮组 -->
         <div class="btn-group">
             <div class="search-container">
                 <input type="text" class="search-input" id="searchInput" placeholder="搜索枪械名称/改枪码...">
@@ -444,7 +481,7 @@
             <button class="theme-btn" id="themeBtn">🌞</button>
         </div>
 
-        <!-- 多条目卡片容器（动态渲染） -->
+        <!-- 多条目卡片容器 -->
         <div class="text-group" id="textGroup"></div>
         <div class="decor-line"></div>
     </div>
@@ -455,24 +492,17 @@
     <button class="back-to-top" id="backToTop">↑</button>
 
     <script>
-        // ====================== 无代码配置区（只需修改这里！）======================
+        // ====================== 无代码配置区 ======================
         const config = {
-            // 页面标题
             pageTitle: "theooo的改枪码",
-            // 页面副标题
             pageSubTitle: "点击卡片复制对应改枪码 ✨",
-            // 幸运改枪码按钮文字
             luckyBtnText: "抽幸运改枪码✨",
-            // 暗黑模式按钮图标（白天/黑夜）
             themeBtnIcons: {
                 light: "🌞",
                 dark: "🌙"
             },
-            // 搜索框占位符
             searchPlaceholder: "搜索枪械名称/改枪码...",
-            // 无搜索结果提示文本
             searchEmptyText: "未找到匹配的改枪码 😞",
-            // 改枪码列表（增删/修改只需改这个数组）
             gunCodes: [      
                 "腾龙突击步枪-烽火地带-6IA0JQ00BAFJS4ST7C7E4",
                 "丐腾龙突击步枪-烽火地带-6IIR7400BAFJS4ST7C7E4",
@@ -522,15 +552,132 @@
                 "M7战斗步枪-烽火地带-6IDCL5O01TBN8TTTF638O",
                 "M700狙击步枪-烽火地带-6IFUL540BAFJS4ST7C7E4"
             ],
-            // 复制成功文案
             copySuccessText: "复制成功 ✅",
-            // 幸运码复制成功文案模板（{gunName}会自动替换成枪械名称）
             luckyCopySuccessTemplate: "恭喜抽到【{gunName}】改枪码！✅",
-            // 复制失败文案
             copyFailText: "复制失败，请手动复制！"
         };
-        // ====================== 配置区结束（以下代码无需修改）======================
+        // ====================== 配置区结束 =======================
 
+        // ========== 新增：鼠标跟随粒子效果 ==========
+        class ParticleEffect {
+            constructor() {
+                this.canvas = document.getElementById('particleCanvas');
+                this.ctx = this.canvas.getContext('2d');
+                this.particles = [];
+                this.canvasWidth = window.innerWidth;
+                this.canvasHeight = window.innerHeight;
+                this.mouse = { x: null, y: null, radius: 150 };
+
+                // 设置画布尺寸
+                this.resizeCanvas();
+                window.addEventListener('resize', () => this.resizeCanvas());
+
+                // 监听鼠标移动
+                window.addEventListener('mousemove', (e) => {
+                    this.mouse.x = e.x;
+                    this.mouse.y = e.y;
+                });
+
+                // 冷色系粒子颜色库
+                this.colors = [
+                    '#0288d1', '#2196f3', '#42a5f5', '#64b5f6', // 蓝色系
+                    '#26a69a', '#26c6da', '#4dd0e1', '#80deea', // 青色系
+                    '#7e57c2', '#9575cc', '#b39ddb', '#d1c4e9', // 紫色系
+                    '#00acc1', '#00bcd4', '#00c853', '#69f0ae'  // 蓝绿系
+                ];
+
+                // 初始化粒子
+                this.initParticles();
+
+                // 动画循环
+                this.animate();
+            }
+
+            // 调整画布尺寸
+            resizeCanvas() {
+                this.canvas.width = window.innerWidth;
+                this.canvas.height = window.innerHeight;
+                this.canvasWidth = window.innerWidth;
+                this.canvasHeight = window.innerHeight;
+            }
+
+            // 初始化粒子
+            initParticles() {
+                this.particles = [];
+                const particleCount = Math.floor((this.canvasWidth * this.canvasHeight) / 15000); // 自适应粒子数量
+                
+                for (let i = 0; i < particleCount; i++) {
+                    const size = Math.random() * 3 + 1;
+                    this.particles.push({
+                        x: Math.random() * this.canvasWidth,
+                        y: Math.random() * this.canvasHeight,
+                        size: size,
+                        speedX: Math.random() * 0.5 - 0.25, // 慢速移动
+                        speedY: Math.random() * 0.5 - 0.25,
+                        color: this.colors[Math.floor(Math.random() * this.colors.length)],
+                        opacity: Math.random() * 0.5 + 0.3 // 半透明
+                    });
+                }
+            }
+
+            // 绘制粒子
+            drawParticle(particle) {
+                this.ctx.beginPath();
+                this.ctx.arc(particle.x, particle.y, particle.size, 0, Math.PI * 2);
+                this.ctx.fillStyle = particle.color;
+                this.ctx.globalAlpha = particle.opacity;
+                this.ctx.fill();
+                this.ctx.globalAlpha = 1;
+            }
+
+            // 更新粒子位置（跟随鼠标）
+            updateParticles() {
+                for (let i = 0; i < this.particles.length; i++) {
+                    const p = this.particles[i];
+
+                    // 鼠标吸引力
+                    if (this.mouse.x && this.mouse.y) {
+                        const dx = this.mouse.x - p.x;
+                        const dy = this.mouse.y - p.y;
+                        const distance = Math.sqrt(dx * dx + dy * dy);
+                        const forceDirectionX = dx / distance;
+                        const forceDirectionY = dy / distance;
+                        const maxDistance = this.mouse.radius;
+                        const force = (maxDistance - distance) / maxDistance;
+
+                        if (distance < maxDistance) {
+                            p.x += forceDirectionX * force * 0.8;
+                            p.y += forceDirectionY * force * 0.8;
+                        }
+                    }
+
+                    // 粒子移动
+                    p.x += p.speedX;
+                    p.y += p.speedY;
+
+                    // 边界检测（超出屏幕重置）
+                    if (p.x < 0 || p.x > this.canvasWidth) p.speedX = -p.speedX;
+                    if (p.y < 0 || p.y > this.canvasHeight) p.speedY = -p.speedY;
+
+                    // 绘制粒子
+                    this.drawParticle(p);
+                }
+            }
+
+            // 动画循环
+            animate() {
+                this.ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
+                this.updateParticles();
+                requestAnimationFrame(() => this.animate());
+            }
+        }
+
+        // 初始化粒子效果
+        window.addEventListener('load', () => {
+            new ParticleEffect();
+        });
+
+        // ========== 原有逻辑保留（仅调整部分样式关联） ==========
         // 获取核心元素
         const copyToast = document.getElementById('copyToast');
         const backToTop = document.getElementById('backToTop');
@@ -540,127 +687,106 @@
         const pageSubTitle = document.getElementById('pageSubTitle');
         const textGroup = document.getElementById('textGroup');
         const body = document.body;
-        // 新增搜索相关元素
         const searchInput = document.getElementById('searchInput');
         const clearSearchBtn = document.getElementById('clearSearchBtn');
 
-        // 初始化页面文本（从配置区读取）
+        // 初始化页面文本
         pageTitle.textContent = config.pageTitle;
         pageSubTitle.textContent = config.pageSubTitle;
         luckyBtn.textContent = config.luckyBtnText;
         searchInput.placeholder = config.searchPlaceholder || "搜索枪械名称/改枪码...";
 
-        // 动态渲染改枪码列表（支持过滤）
+        // 动态渲染改枪码列表
         function renderGunCodes(filteredCodes = null) {
-            textGroup.innerHTML = ''; // 清空原有内容
-            // 如果没有过滤列表，使用原始列表
+            textGroup.innerHTML = '';
             const codesToRender = filteredCodes || config.gunCodes;
             
-            // 有匹配结果时渲染列表
             if (codesToRender.length > 0) {
                 codesToRender.forEach(code => {
                     const item = document.createElement('div');
                     item.className = 'main-text';
                     item.textContent = code;
-                    // 绑定点击复制事件
                     item.addEventListener('click', () => {
                         copyTextToClipboard(code, item);
                     });
                     textGroup.appendChild(item);
                 });
             } else {
-                // 无匹配结果时显示提示
                 const emptyTip = document.createElement('div');
                 emptyTip.className = 'main-text';
                 emptyTip.style.textAlign = 'center';
                 emptyTip.style.color = 'var(--text-secondary)';
                 emptyTip.style.cursor = 'default';
                 emptyTip.textContent = config.searchEmptyText || '未找到匹配的改枪码 😞';
-                // 移除无结果提示的点击事件和hover效果
                 emptyTip.addEventListener('click', (e) => e.preventDefault());
                 emptyTip.style.pointerEvents = 'none';
                 textGroup.appendChild(emptyTip);
             }
         }
 
-        // 初始化渲染改枪码列表
+        // 初始化渲染
         renderGunCodes();
 
-        // ========== 新增：搜索功能逻辑 ==========
+        // 搜索功能逻辑
         function handleSearch() {
             const keyword = searchInput.value.trim().toLowerCase();
-            // 显示/隐藏清除按钮
             if (keyword) {
                 clearSearchBtn.classList.add('show');
-                // 过滤改枪码（不区分大小写）
                 const filtered = config.gunCodes.filter(code => 
                     code.toLowerCase().includes(keyword)
                 );
                 renderGunCodes(filtered);
             } else {
                 clearSearchBtn.classList.remove('show');
-                // 清空搜索，恢复所有条目
                 renderGunCodes();
             }
         }
 
-        // 监听搜索输入（实时过滤）
         searchInput.addEventListener('input', handleSearch);
-        // 清除搜索按钮点击事件
         clearSearchBtn.addEventListener('click', () => {
             searchInput.value = '';
             clearSearchBtn.classList.remove('show');
             renderGunCodes();
-            // 聚焦输入框提升体验
             searchInput.focus();
         });
-        // 按回车触发搜索（可选增强）
         searchInput.addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 handleSearch();
-                searchInput.blur(); // 失焦收起键盘（移动端）
+                searchInput.blur();
             }
         });
 
-        // ========== 生成随机渐变颜色的函数 ==========
+        // 生成随机渐变颜色（冷色系）
         function generateRandomGradient() {
-            // 随机生成3个柔和的RGB颜色（避免过暗/过亮，适配文字可读性）
             const getRandomColor = () => {
-                // 限定颜色范围：R/G/B在50-220之间，保证柔和且不刺眼
-                const r = Math.floor(Math.random() * 170) + 50;
-                const g = Math.floor(Math.random() * 170) + 50;
-                const b = Math.floor(Math.random() * 170) + 50;
+                // 冷色系RGB范围
+                const r = Math.floor(Math.random() * 80) + 40; // 低红
+                const g = Math.floor(Math.random() * 120) + 80; // 中高绿
+                const b = Math.floor(Math.random() * 150) + 100; // 高蓝
                 return `rgb(${r}, ${g}, ${b})`;
             };
-            // 随机渐变方向（0-360度）
             const angle = Math.floor(Math.random() * 360);
-            // 生成3色线性渐变
             return `linear-gradient(${angle}deg, ${getRandomColor()}, ${getRandomColor()}, ${getRandomColor()})`;
         }
 
-        // ========== 鼠标跟随渐变背景 ==========
+        // 鼠标跟随背景（保留）
         body.addEventListener('mousemove', (e) => {
-            // 计算鼠标位置占视口的比例，控制背景偏移（最大10%）
             const x = e.clientX / window.innerWidth * 10;
             const y = e.clientY / window.innerHeight * 10;
             body.style.backgroundPosition = `${x}% ${y}%`;
         });
 
-        // ========== 复制功能 ==========
+        // 复制功能
         const copyTextToClipboard = async (text, el, isLucky = false) => {
             try {
                 await navigator.clipboard.writeText(text.trim());
                 
-                // 生成随机渐变并绑定到元素的CSS变量
                 const randomGradient = generateRandomGradient();
                 el.style.setProperty('--random-fill-gradient', randomGradient);
                 
-                // 触发渐变填充动画
                 el.classList.add('fill');
-                // 动画结束后移除类，避免重复触发冲突
                 setTimeout(() => el.classList.remove('fill'), 1000);
 
-                // 拼接弹窗文案（区分普通复制/幸运码）
                 let toastText = config.copySuccessText;
                 if (isLucky) {
                     const gunName = text.split('-')[0];
@@ -672,7 +798,6 @@
                 copyToast.classList.add('show');
                 setTimeout(() => copyToast.classList.remove('show'), 2000);
 
-                // 点击打勾反馈
                 const checkIcon = document.createElement('span');
                 checkIcon.className = 'check-icon';
                 checkIcon.innerHTML = '✓';
@@ -687,22 +812,18 @@
             }
         };
 
-        // ========== 随机幸运改枪码 ==========
+        // 随机幸运改枪码
         luckyBtn.addEventListener('click', () => {
-            // 获取渲染后的改枪码条目
             const textItems = document.querySelectorAll('.main-text');
             if (textItems.length === 0 || textItems[0].textContent === config.searchEmptyText) return;
             
-            // 随机选一个条目
             const randomIndex = Math.floor(Math.random() * textItems.length);
             const luckyItem = textItems[randomIndex];
             const luckyCode = luckyItem.textContent;
             
-            // 生成随机渐变并绑定
             const randomGradient = generateRandomGradient();
             luckyItem.style.setProperty('--random-fill-gradient', randomGradient);
             
-            // 触发幸运动画+渐变填充动画
             luckyItem.classList.add('lucky');
             luckyItem.classList.add('fill');
             setTimeout(() => {
@@ -710,29 +831,24 @@
                 luckyItem.classList.remove('fill');
             }, 1000);
             
-            // 自动复制
             copyTextToClipboard(luckyCode, luckyItem, true);
         });
 
-        // ========== 暗黑模式切换 ==========
-        // 初始化主题（优先读取本地存储）
+        // 暗黑模式切换
         const savedTheme = localStorage.getItem('theme') || 'light';
         body.setAttribute('data-theme', savedTheme);
         themeBtn.textContent = config.themeBtnIcons[savedTheme];
 
-        // 切换主题
         themeBtn.addEventListener('click', () => {
             const currentTheme = body.getAttribute('data-theme');
             const newTheme = currentTheme === 'light' ? 'dark' : 'light';
             
             body.setAttribute('data-theme', newTheme);
             themeBtn.textContent = config.themeBtnIcons[newTheme];
-            
-            // 保存到本地存储，刷新后保留
             localStorage.setItem('theme', newTheme);
         });
 
-        // ========== 回到顶部功能 ==========
+        // 回到顶部功能
         window.addEventListener('scroll', () => {
             if (window.scrollY > 300) {
                 backToTop.classList.add('show');
@@ -753,8 +869,3 @@
     </script>
 </body>
 </html>
-
-
-
-
-
